@@ -1,0 +1,25 @@
+.container {
+        min-height: 100vh;
+        min-width: 100vw;
+        display: grid;
+        grid-template-columns: 0.3fr 1fr 0.3fr;
+        grid-template-rows: 0.3fr 1fr 0.3fr;
+        gap: 0px 0px;
+        grid-template-areas:
+          ". title ."
+          ". content ."
+          ". . .";
+        align-items: center;
+        justify-content: center;
+        
+        .content {
+          grid-area: content;
+        }
+        
+        .title {
+          grid-area: title;
+          color: white;
+          font-size: 35;
+        }
+}
+

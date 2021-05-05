@@ -1,0 +1,45 @@
+{
+    "data_types": 
+        [
+            {
+                "name": "Integer",
+                "value": "int"
+            },
+            {
+                "name": "String",
+                "value": "string"
+            },
+            {
+                "name": "Date",
+                "value": "date"
+            } 
+        ]
+    ,
+    "default_values": {
+        "string": {
+            "min": 0,
+            "max": 100,
+            "help": "Min-Max String length"
+        },
+        "int": {
+            "min": 0,
+            "max": 100,
+            "help": "Min-Max Integer values"
+        },
+        "date": {
+            "min": "undefined",
+            "max": "undefined",
+            "help": "Min-Max Dates"
+        }
+    },
+    "default_texts": {
+        "field_name": {
+            "name": "Field Name",
+            "help": "The name you want your field to have"
+        },
+        "field_type": {
+            "name": "Field Type",
+            "help": "The variable type you want your field to be"
+        }
+    }
+}

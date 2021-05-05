@@ -1,0 +1,20 @@
+.wrapper {
+    width: inherit;
+    height: auto;
+    align-items: flex-start;
+    flex-direction: row;
+    display: flex;
+    
+    .field_name_wrapper {
+        width: fit-content;
+        margin-right: 1em;
+        width: 20em;
+        text-align: left;
+    }
+    
+    .field_value_wrapper {
+        width: fit-content;
+        margin-right: 1em;
+    }
+}
+

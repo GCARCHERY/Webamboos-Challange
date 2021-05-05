@@ -48,7 +48,7 @@ class AddField extends React.Component<Props> {
     };
 
     onFinishFailed = (errorInfo:any) => {
-        errorInfo.errorFields.map((element:any) => {
+        errorInfo.errorFields.forEach((element:any) => {
             message.error(element.errors);
             if(element.name[0] === 'Field Name' && !this.state.field_name_error) {
                 this.setState({field_name_error: true})
@@ -114,7 +114,7 @@ class AddField extends React.Component<Props> {
                             {   this.state.data_type === 'date' ? 
                                     <DatePicker.RangePicker 
                                         onChange={(data: any) => {
-                                            data.map((element:any, key: number) => {
+                                            data.forEach((element:any, key: number) => {
                                                 if(key) {
                                                     this.setState({min: element})
                                                 }else{
@@ -129,7 +129,6 @@ class AddField extends React.Component<Props> {
                                             defaultValue={0}
                                             value={this.state.min}
                                             onChange={(event) => {
-                                                console.log(event)
                                                 if(event >= 0) {
                                                     this.setState({min: event })
                                                 }
@@ -140,7 +139,6 @@ class AddField extends React.Component<Props> {
                                             defaultValue={100}
                                             value={this.state.max}
                                             onChange={(event) => {
-                                                console.log(event)
                                                 if(event >= 0) {
                                                     this.setState({max: event })
                                                 }

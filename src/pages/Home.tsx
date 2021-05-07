@@ -8,7 +8,7 @@ class Home extends React.Component {
   render() {
     return (
       <div className="container">
-          <h1 className="title">Webamboos Challange</h1>
+          <h1 className="title">Webamboos Challenge</h1>
           <div className="content">
             <FieldCard/>
           </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { Button, Input, Form, message, DatePicker, Select, InputNumber } from "antd";
 
 import './AddFieldStyle.scss'
@@ -12,151 +12,198 @@ interface Props {
     onSubmit?: Function 
 }
 
-class AddField extends React.Component<Props> {
-    state = {
-        ////////////////////////////
-        field_name: '',
-        field_name_validated: false,
-        field_name_error: false,
-        ////////////////////////////
-        min: 0,
-        max: 100,
-        ////////////////////////////
-        data_type: fieldConfig.data_types[0].value as FieldData["Field Type"]
-    }
+export default function AddField(props: Props) {
 
-    onFinish = (values: FieldData) => {
+    /////////////// -- DECLARE-STATES -- ///////////////////
+
+    const [field_name, updateFieldName] = useState('')
+    const [field_name_validated, updateFieldNameValidated] = useState(false)
+    const [field_name_error, updateFieldNameError] = useState(false)
+    const [data_type, updateDataType] = useState(fieldConfig.data_types[0].value as FieldData["Field Type"])
+    const [min, updateMin] = useState(0)
+    const [max, updateMax] = useState(100)
+
+    console.log(field_name)
+
+    /////////////// -- END-DECLARE-STATES -- ///////////////////
+
+    /////////////// -- FORM-HANDLE -- ///////////////////
+
+    const onFinish = (values: FieldData) => {
         let data = values
         data['Min-Max'] = {
-            min: this.state.min,
-            max: this.state.max
+            min: min,
+            max: max
         }
-        this.setState({
-            field_name: '',
-            min: 0,
-            max: 100,
-            data_type: fieldConfig.data_types[0].value
-        })
-        let Form:any = (document.getElementById("field-config-form"))
-        if(Form) {
-            Form.reset()
+
+        updateFieldName('')
+        updateMin(0)
+        updateMax(100)
+
+        let Document:any = (document.getElementById("field-config-form"))
+        if(Document) {
+            Document.reset()
         }
         
-        if(this.props.onSubmit) {
-            this.props.onSubmit(data)
+        if(props.onSubmit) {
+            props.onSubmit(data)
         }
     };
 
-    onFinishFailed = (errorInfo:any) => {
+    const onFinishFailed = (errorInfo:any) => {
         errorInfo.errorFields.forEach((element:any) => {
             message.error(element.errors);
-            if(element.name[0] === 'Field Name' && !this.state.field_name_error) {
-                this.setState({field_name_error: true})
+            if(element.name[0] === 'Field Name' && !field_name_error) {
+                updateFieldNameError(true)
             }
         })
         
     };
 
-    renderDataTypes() {
+    /////////////// -- END-FORM-HANDLE -- ///////////////////
+
+    /////////////// -- DATA-TYPES -- ///////////////////
+
+    const renderDataTypes: Function = () => {
         return fieldConfig.data_types.map((data_type, key) => {
             return <Select.Option value={data_type.value} key={key}>{data_type.name}</Select.Option>
         })
     }
 
-  render() {
+    /////////////// -- END-DATA-TYPES -- ///////////////////
+
+    /////////////// -- TEXT-INPUT-HANDLE -- ///////////////////
+
+    const onTextInputChange = (event:any) => {
+        updateFieldName(event.target.value)
+        if(event.target.value && !field_name_validated) {
+            updateFieldNameValidated(true)
+            updateFieldNameError(false)
+        }else if(!event.target.value) {
+            updateFieldNameValidated(false)
+            updateFieldNameError(true)
+        }
+    }
+
+    /////////////// -- END-TEXT-INPUT-HANDLE -- ///////////////////
+
+    /////////////// -- RANGE-PICKER-HANDLE -- ///////////////////
+
+    const onRangePickerChange = (data:any) => {
+        data.forEach((element:any, key: number) => {
+            if(key) {
+                updateMin(element)
+            }else{
+                updateMax(element)
+            }
+        }) 
+    }
+
+    /////////////// -- END-RANGE-PICKER-HANDLE -- ///////////////////
+
+    /////////////// -- DECLARE-RENDER-CONFIG-SETTINGS -- ///////////////////
+
+    const renderConfigSettings:Function = () => {
+        if(data_type === 'date') {
+            return  (
+                        <DatePicker.RangePicker 
+                            onChange={(data: any) => {onRangePickerChange(data)}}
+                        /> 
+                    )
+        }else{
+            return  (
+                        <div>
+                            <InputNumber
+                                defaultValue={0}
+                                value={min}
+                                onChange={(event) => { if(event >= 0) updateMin(event) }}
+                                parser={value => parseInt(value?.replace(/\$\s?|(,*)/g, '') ? value.replace(/\$\s?|(,*)/g, '') : '0')}
+                            />
+                            <InputNumber
+                                defaultValue={100}
+                                value={max}
+                                onChange={(event) => { if(event >= 0) updateMax(event) }}
+                                parser={value => parseInt(value?.replace(/\$\s?|(,*)/g, '') ? value.replace(/\$\s?|(,*)/g, '') : '100')}
+                            />
+                        </div>
+                    )
+        }
+    }
+
+    /////////////// -- DECLARE-RENDER-CONFIG-SETTINGS -- ///////////////
+
+    ////////////////////////////////////////////////////////////////////
+
     return (
             <div className='add_field_wrapper'>
                 <Form
                     id='field-config-form'
                     name="basic"
                     initialValues={{ remember: true }}
-                    onFinish={this.onFinish}
-                    onFinishFailed={this.onFinishFailed}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
                 >
+                    {/* /////////////// -- FORM-ITEM -- /////////////////// */}
+
                     <Form.Item 
-                        validateStatus={this.state.field_name_validated ? 'success': this.state.field_name_error ? 'error' : ''} 
+                        validateStatus={field_name_validated ? 'success': field_name_error ? 'error' : ''} 
                         help={fieldConfig.default_texts.field_name.help}
                         name={fieldConfig.default_texts.field_name.name}
                         rules={[{required: true}]}
                     >
                         <Input 
                             placeholder={fieldConfig.default_texts.field_name.name}
-                            onChange={(event) => {
-                                this.setState({field_name: event.target.value})
-                                if(event.target.value && !this.state.field_name_validated) {
-                                    this.setState({field_name_validated: true, field_name_error: false})
-                                }else if(!event.target.value) {
-                                    this.setState({field_name_validated: false, field_name_error: true})
-                                }
-                            }}
+                            onChange={(event) => {onTextInputChange(event)}}
                         />
                     </Form.Item>
+
+                    {/* /////////////// -- END-FORM-ITEM -- /////////////////// */}
+
+                    {/* /////////////////////////////////////////////////////// */}
+
+                    {/* /////////////// -- FORM-ITEM -- /////////////////// */}
+
                     <Form.Item 
                         help={fieldConfig.default_texts.field_type.help}
                         name={fieldConfig.default_texts.field_type.name}
-                        initialValue={this.state.data_type}
+                        initialValue={data_type}
                     >
                         <Select 
                             style={{ width: '30%' }} 
-                            defaultValue={this.state.data_type} 
-                            onChange={(event) => {
-                                this.setState({data_type: event})
-                            }}
-                            value={this.state.data_type}
+                            defaultValue={data_type} 
+                            onChange={(event) => {updateDataType(event)}}
+                            value={data_type}
                         >
-                            {this.renderDataTypes()}
+                            {renderDataTypes()}
                         </Select>
                     </Form.Item>
+
+                    {/* /////////////// -- END-FORM-ITEM -- /////////////////// */}
+
+                    {/* /////////////////////////////////////////////////////// */}
+
+                    {/* /////////////// -- FORM-ITEM -- /////////////////// */}
+
                     <Form.Item 
-                        help={fieldConfig.default_values[this.state.data_type].help}
-                        hasFeedback 
+                        help={fieldConfig.default_values[data_type].help}
                     >
-                            {   this.state.data_type === 'date' ? 
-                                    <DatePicker.RangePicker 
-                                        onChange={(data: any) => {
-                                            data.forEach((element:any, key: number) => {
-                                                if(key) {
-                                                    this.setState({min: element})
-                                                }else{
-                                                    this.setState({max: element})
-                                                }
-                                            }) 
-                                        }}
-                                    /> 
-                                :
-                                    <div>
-                                        <InputNumber
-                                            defaultValue={0}
-                                            value={this.state.min}
-                                            onChange={(event) => {
-                                                if(event >= 0) {
-                                                    this.setState({min: event })
-                                                }
-                                            }}
-                                            parser={value => parseInt(value?.replace(/\$\s?|(,*)/g, '') ? value.replace(/\$\s?|(,*)/g, '') : '0')}
-                                        />
-                                        <InputNumber
-                                            defaultValue={100}
-                                            value={this.state.max}
-                                            onChange={(event) => {
-                                                if(event >= 0) {
-                                                    this.setState({max: event })
-                                                }
-                                            }}
-                                            parser={value => parseInt(value?.replace(/\$\s?|(,*)/g, '') ? value.replace(/\$\s?|(,*)/g, '') : '100')}
-                                        />
-                                    </div>
-                            }
+                        {renderConfigSettings()}
                     </Form.Item>
+
+                    {/* /////////////// -- END-FORM-ITEM -- /////////////////// */}
+
+                    {/* /////////////////////////////////////////////////////// */}
+
+                    {/* /////////////// -- SUBMIT-BUTTON -- /////////////////// */}
+
                     <Form.Item>
                         <Button type="primary" htmlType="submit">
                             Add Field
                         </Button>
                     </Form.Item>
+
+                    {/* /////////////// -- END-SUBMIT-BUTTON -- /////////////////// */}
                 </Form>
             </div>
     );
-  }
 }
-
-export default AddField;

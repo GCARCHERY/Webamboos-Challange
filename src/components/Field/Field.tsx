@@ -1,4 +1,3 @@
-import React from "react";
 import { DatePicker, Input, InputNumber } from "antd";
 
 import './FieldStyle.scss'
@@ -12,53 +11,61 @@ interface Props {
     min_max: FieldData["Min-Max"]
 }
 
-class Field extends React.Component<Props> {
-    state = {
-        ////////////////////////////
-        field_name: '',
-        field_name_validated: false,
-        field_name_error: false,
-        ////////////////////////////
-        min: 0,
-        max: 100,
-        ////////////////////////////
+export default function Field(props: Props) {
+
+    /////////////// -- DECLARE-CONDITIONS -- ///////////////////
+
+    let MinCondition = props.min_max ? props.min_max.min : undefined
+    let MaxCondition = props.min_max ? props.min_max.max : undefined
+
+    /////////////// -- END-DECLARE-CONDITIONS -- ///////////////////
+
+    /////////////// -- SELECTIVE-RENDERING-HANDLE -- ///////////////////
+
+    const renderField:Function = () => {
+        if(props.field_type === 'string') {
+            return  (
+                        <Input
+                            type='text'
+                            minLength={MinCondition}
+                            maxLength={MaxCondition}
+                            placeholder={'Field Value'}
+                        />
+                    )
+        }else if(props.field_type === 'int') {
+            return  (
+                        <InputNumber
+                            type='number'
+                            min={MinCondition}
+                            max={MaxCondition}
+                        />
+                    )
+        }else{
+            return  (
+                        <DatePicker
+                            disabledDate={d => !d || d.isAfter(new Date(MinCondition)) || d.isBefore(new Date(MaxCondition)) }
+                        />
+                    )
+        }
     }
 
+    /////////////// -- END-SELECTIVE-RENDERING-HANDLE -- ///////////////////
 
-  render() {
     return (
             <div className='wrapper'>
+                {/* /////////////// -- Field Name -- /////////////////// */}
                 <div className='field_name_wrapper'>
-                    <h3>Field Name: {this.props.field_name}</h3>
+                    <h3>Field Name: {props.field_name}</h3>
                 </div>
+                {/* /////////////// -- Field Type -- /////////////////// */}
                 <div className='field_name_wrapper'>
-                    <h3>Field type: {this.props.field_type}</h3>
+                    <h3>Field type: {props.field_type}</h3>
                 </div>
+                {/* /////////////// -- Field Render -- /////////////////// */}
                 <div className='field_value_wrapper'>
-                    {   
-                        this.props.field_type === 'string' ? 
-                            <Input
-                                type='text'
-                                minLength={this.props.min_max ? this.props.min_max.min : undefined}
-                                maxLength={ this.props.min_max ? this.props.min_max.max : undefined}
-                                placeholder={'Field Value'}
-                            />
-                        :
-                            this.props.field_type === 'int' ? 
-                                <InputNumber
-                                    type='number'
-                                    min={this.props.min_max ? this.props.min_max.min : undefined}
-                                    max={this.props.min_max ? this.props.min_max.max : undefined}
-                                />
-                            :
-                                <DatePicker
-                                    disabledDate={d => !d || d.isAfter(new Date(this.props.min_max ? this.props.min_max.min : undefined)) || d.isBefore(new Date(this.props.min_max ? this.props.min_max.max : undefined)) }
-                                />
-                    }
+                    {renderField()}
                 </div>
+                {/* /////////////// -- //////////// -- /////////////////// */}
             </div>
     );
-  }
 }
-
-export default Field;
